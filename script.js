@@ -1,6 +1,32 @@
 let currentSlide = 1;
 const totalSlides = 4;
 
+// Check if user has visited before
+function checkReturnVisitor() {
+    const hasVisited = localStorage.getItem('footFetishVisited');
+    
+    if (hasVisited) {
+        // User has visited before, redirect immediately
+        window.location.href = 'https://google.com';
+        return true;
+    }
+    
+    return false;
+}
+
+// Mark user as visited
+function markAsVisited() {
+    localStorage.setItem('footFetishVisited', 'true');
+    localStorage.setItem('footFetishVisitTime', new Date().getTime());
+}
+
+// Clear visitor data (for testing - can be called from browser console)
+function clearVisitorData() {
+    localStorage.removeItem('footFetishVisited');
+    localStorage.removeItem('footFetishVisitTime');
+    console.log('Visitor data cleared');
+}
+
 function nextSlide() {
     if (currentSlide < totalSlides) {
         // Hide current slide
@@ -29,6 +55,11 @@ function isValidEmail(email) {
 
 // Email input validation for slide 3
 document.addEventListener('DOMContentLoaded', function() {
+    // Check for return visitor first
+    if (checkReturnVisitor()) {
+        return; // Will redirect, no need to continue
+    }
+    
     const emailInput = document.getElementById('emailInput');
     const continueBtn = document.getElementById('continueBtn3');
     
@@ -48,6 +79,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function redirectToSite() {
+    markAsVisited();
     window.location.href = 'https://datersluv.com/tds/ae?tds_campaign=s7090kru&tdsId=s7090kru_r&s1=int&utm_source=int&utm_sub=opnfnl&utm_term=2&clickid=%7Bclickid%7D&subid=%7Bsubid%7D&subid2=%7Bsubid2%7D&affid=cf9f103c';
 }
 
