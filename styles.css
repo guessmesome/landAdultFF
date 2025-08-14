@@ -14,10 +14,10 @@ body {
 
 .app-container {
     position: relative;
-    width: 100%;
+    width: 100vw;
     height: 100vh;
-    max-width: 390px;
-    margin: 0 auto;
+    height: 100dvh; /* Dynamic viewport height for mobile */
+    margin: 0;
     overflow: hidden;
     background: #7945E5;
 }
@@ -494,34 +494,72 @@ body {
     box-shadow: none;
 }
 
-/* Responsive Design */
-@media screen and (max-width: 390px) {
-    .app-container {
-        width: 100vw;
+/* Small mobile screens */
+@media screen and (max-width: 375px) {
+    .welcome-part, .join-part {
+        font-size: 18px !important;
     }
     
-    .content {
-        padding: 30px 20px;
+    .app-title, .taste-title, .age-title {
+        font-size: 22px !important;
     }
     
-    .categories-grid {
-        max-width: 280px;
-        gap: 15px;
+    .warning-title {
+        font-size: 24px !important;
     }
     
-    .category-icon {
-        width: 50px;
-        height: 50px;
+    .continue-btn {
+        font-size: 14px !important;
+        height: 45px !important;
     }
     
-    .category-item span {
-        font-size: 9px;
+    .email-input {
+        font-size: 14px !important;
+        height: 45px !important;
     }
+}
+
+/* Very small screens */
+@media screen and (max-width: 320px) {
+    .welcome-part, .join-part {
+        font-size: 16px !important;
+    }
+    
+    .app-title, .taste-title, .age-title {
+        font-size: 20px !important;
+    }
+    
+    .warning-title {
+        font-size: 22px !important;
+    }
+}
+
+/* Mobile-first responsive design */
+@media screen and (max-height: 700px) {
+    /* Scale down for short screens */
+    .welcome-text { top: 480px !important; }
+    .app-title { top: 520px !important; }
+    .subtitle { top: 550px !important; }
+    #slide1 .continue-btn { top: 580px !important; }
+    
+    .match-title { top: 480px !important; }
+    .taste-title { top: 510px !important; }
+    .match-subtitle { top: 550px !important; }
+    #slide2 .continue-btn { top: 580px !important; }
+    
+    .join-text { top: 480px !important; }
+    #slide3 .email-input { top: 520px !important; }
+    #slide3 .continue-btn { top: 580px !important; }
+    
+    .warning-title { top: 480px !important; }
+    .age-title { top: 510px !important; }
+    .age-subtitle { top: 540px !important; }
+    #slide4 .continue-btn { top: 580px !important; }
 }
 
 @media screen and (min-width: 391px) {
     .app-container {
-        border: 1px solid #ddd;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        max-width: 390px;
+        margin: 0 auto;
     }
 }
