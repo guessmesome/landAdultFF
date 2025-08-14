@@ -50,6 +50,7 @@ body {
     height: 100%;
     background-size: cover;
     background-position: center;
+    background-repeat: no-repeat;
     z-index: -1;
 }
 
@@ -57,24 +58,36 @@ body {
     background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
     background-image: url('images/bg1.jpg');
     background-blend-mode: overlay;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
 }
 
 .bg2 {
     background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
     background-image: url('images/bg2.jpg');
     background-blend-mode: overlay;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
 }
 
 .bg3 {
     background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
     background-image: url('images/bg3.jpg');
     background-blend-mode: overlay;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
 }
 
 .bg4 {
     background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
     background-image: url('images/bg4.jpg');
     background-blend-mode: overlay;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
 }
 
 .content {
