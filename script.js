@@ -6,8 +6,19 @@ function checkReturnVisitor() {
     const hasVisited = localStorage.getItem('footFetishVisited');
     
     if (hasVisited) {
-        // User has visited before, redirect immediately
-        window.location.href = 'https://ef-to-wz.com/tds/ae?tds_campaign=s7788kru&tdsId=s7788kru_r&s1=int&utm_source=int&utm_term=3&p7=%7Bp7%7D&clickid=%7Bclickid%7D&subid=%7Bsubid%7D&subid2=%7Bsubid2%7D&affid=cf9f103c';
+        // User has visited before, redirect immediately with saved email
+        const savedEmail = localStorage.getItem('userEmail');
+        let baseUrl = 'https://wx-to-nm.com/tds/ae?tdsId=s7079gre_r&tds_campaign=s7079gre&s1=int&utm_source=int';
+        
+        // Add _fData parameter if email exists
+        if (savedEmail) {
+            const encodedEmail = encodeEmailToBase64(savedEmail);
+            baseUrl += `&_fData=${encodedEmail}`;
+        }
+        
+        baseUrl += '&utm_term=1&affid=bf9e8768&subid={subid}&subid2={subid2}&clickid={clickid}';
+        
+        window.location.href = baseUrl;
         return true;
     }
     
@@ -44,6 +55,8 @@ function nextSlideWithEmail() {
     
     // Check if email is valid
     if (email && isValidEmail(email)) {
+        // Save email to localStorage
+        localStorage.setItem('userEmail', email);
         nextSlide();
     }
 }
@@ -51,6 +64,17 @@ function nextSlideWithEmail() {
 function isValidEmail(email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
+}
+
+// Function to encode email to base64 JSON format
+function encodeEmailToBase64(email) {
+    if (!email) return '';
+    
+    const emailObj = { "email": email };
+    const jsonString = JSON.stringify(emailObj);
+    
+    // Encode to base64
+    return btoa(jsonString);
 }
 
 // Email input validation for slide 3
@@ -80,7 +104,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function redirectToSite() {
     markAsVisited();
-    window.location.href = 'https://ef-to-wz.com/tds/ae?tds_campaign=s7788kru&tdsId=s7788kru_r&s1=int&utm_source=int&utm_term=3&p7=%7Bp7%7D&clickid=%7Bclickid%7D&subid=%7Bsubid%7D&subid2=%7Bsubid2%7D&affid=cf9f103c';
+    
+    // Get saved email from localStorage
+    const savedEmail = localStorage.getItem('userEmail');
+    let baseUrl = 'https://wx-to-nm.com/tds/ae?tdsId=s7079gre_r&tds_campaign=s7079gre&s1=int&utm_source=int';
+    
+    // Add _fData parameter if email exists
+    if (savedEmail) {
+        const encodedEmail = encodeEmailToBase64(savedEmail);
+        baseUrl += `&_fData=${encodedEmail}`;
+    }
+    
+    baseUrl += '&utm_term=1&affid=bf9e8768&subid={subid}&subid2={subid2}&clickid={clickid}';
+    
+    window.location.href = baseUrl;
 }
 
 // Touch/swipe functionality for mobile
