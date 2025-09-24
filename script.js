@@ -27,7 +27,7 @@ function checkReturnVisitor() {
     const hasVisited = localStorage.getItem('footFetishVisited');
     console.log('checkReturnVisitor() called, hasVisited:', hasVisited);
     
-    if (hasVisited && false) {
+    if (hasVisited) {
         // User has visited before, redirect immediately with saved email
         const savedEmail = localStorage.getItem('userEmail');
         console.log('Return visitor, saved email:', savedEmail);
