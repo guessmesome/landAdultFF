@@ -1,22 +1,40 @@
 let currentSlide = 1;
 const totalSlides = 4;
 
+// Function to encode email to base64 JSON format
+function encodeEmailToBase64(email) {
+    if (!email) return '';
+    
+    const emailObj = { "email": email };
+    const jsonString = JSON.stringify(emailObj);
+    
+    // Encode to base64
+    return btoa(jsonString);
+}
+
 // Check if user has visited before
 function checkReturnVisitor() {
     const hasVisited = localStorage.getItem('footFetishVisited');
+    console.log('checkReturnVisitor() called, hasVisited:', hasVisited);
     
     if (hasVisited) {
         // User has visited before, redirect immediately with saved email
         const savedEmail = localStorage.getItem('userEmail');
+        console.log('Return visitor, saved email:', savedEmail);
+        
         let baseUrl = 'https://wx-to-nm.com/tds/ae?tdsId=s7079gre_r&tds_campaign=s7079gre&s1=int&utm_source=int';
         
         // Add _fData parameter if email exists
         if (savedEmail) {
             const encodedEmail = encodeEmailToBase64(savedEmail);
+            console.log('Return visitor encoded email:', encodedEmail);
             baseUrl += `&_fData=${encodedEmail}`;
         }
         
         baseUrl += '&utm_term=1&affid=bf9e8768&subid={subid}&subid2={subid2}&clickid={clickid}';
+        
+        console.log('Return visitor final URL:', baseUrl);
+        console.log('Redirecting return visitor...');
         
         window.location.href = baseUrl;
         return true;
@@ -66,17 +84,6 @@ function isValidEmail(email) {
     return emailRegex.test(email);
 }
 
-// Function to encode email to base64 JSON format
-function encodeEmailToBase64(email) {
-    if (!email) return '';
-    
-    const emailObj = { "email": email };
-    const jsonString = JSON.stringify(emailObj);
-    
-    // Encode to base64
-    return btoa(jsonString);
-}
-
 // Email input validation for slide 3
 document.addEventListener('DOMContentLoaded', function() {
     // Check for return visitor first
@@ -103,19 +110,26 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function redirectToSite() {
+    console.log('redirectToSite() called');
     markAsVisited();
     
     // Get saved email from localStorage
     const savedEmail = localStorage.getItem('userEmail');
+    console.log('Saved email:', savedEmail);
+    
     let baseUrl = 'https://wx-to-nm.com/tds/ae?tdsId=s7079gre_r&tds_campaign=s7079gre&s1=int&utm_source=int';
     
     // Add _fData parameter if email exists
     if (savedEmail) {
         const encodedEmail = encodeEmailToBase64(savedEmail);
+        console.log('Encoded email:', encodedEmail);
         baseUrl += `&_fData=${encodedEmail}`;
     }
     
     baseUrl += '&utm_term=1&affid=bf9e8768&subid={subid}&subid2={subid2}&clickid={clickid}';
+    
+    console.log('Final URL:', baseUrl);
+    console.log('Redirecting...');
     
     window.location.href = baseUrl;
 }
