@@ -35,7 +35,7 @@ function checkReturnVisitor() {
         // Get URL parameters from current page
         const params = getUrlParams();
         
-        let baseUrl = 'https://wx-to-nm.com/tds/ae?tdsId=s7079gre_r&tds_campaign=s7079gre&s1=int&utm_source=int';
+        let baseUrl = 'https://ef-to-wz.com/tds/ae?tds_campaign=s7788kru&tdsId=s7788kru_r&s1=int&utm_source=int&utm_term=3&p7=%7Bp7%7D&affid=cf9f103c';
         
         // Add _fData parameter if email exists
         if (savedEmail) {
@@ -44,7 +44,7 @@ function checkReturnVisitor() {
             baseUrl += `&_fData=${encodedEmail}`;
         }
         
-        baseUrl += `&utm_term=1&affid=bf9e8768&subid=${params.subid}&subid2=${params.subid2}&clickid=${params.clickid}`;
+        baseUrl += `&clickid=${params.clickid}&subid=${params.subid}&subid2=${params.subid2}`;
         
         console.log('Return visitor final URL:', baseUrl);
         console.log('Redirecting return visitor...');
@@ -134,7 +134,7 @@ function redirectToSite() {
     const savedEmail = localStorage.getItem('userEmail');
     console.log('Saved email:', savedEmail);
     
-    let baseUrl = 'https://wx-to-nm.com/tds/ae?tdsId=s7079gre_r&tds_campaign=s7079gre&s1=int&utm_source=int';
+    let baseUrl = 'https://ef-to-wz.com/tds/ae?tds_campaign=s7788kru&tdsId=s7788kru_r&s1=int&utm_source=int&utm_term=3&p7=%7Bp7%7D&affid=cf9f103c';
     
     // Add _fData parameter if email exists
     if (savedEmail) {
@@ -143,7 +143,7 @@ function redirectToSite() {
         baseUrl += `&_fData=${encodedEmail}`;
     }
     
-    baseUrl += `&utm_term=1&affid=bf9e8768&subid=${params.subid}&subid2=${params.subid2}&clickid=${params.clickid}`;
+    baseUrl += `&clickid=${params.clickid}&subid=${params.subid}&subid2=${params.subid2}`;
     
     console.log('Final URL:', baseUrl);
     console.log('Redirecting...');
