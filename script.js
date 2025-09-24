@@ -1,6 +1,16 @@
 let currentSlide = 1;
 const totalSlides = 4;
 
+// Function to get URL parameters
+function getUrlParams() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return {
+        subid: urlParams.get('subid') || '',
+        clickid: urlParams.get('clickid') || '',
+        subid2: urlParams.get('subid2') || ''
+    };
+}
+
 // Function to encode email to base64 JSON format
 function encodeEmailToBase64(email) {
     if (!email) return '';
@@ -22,6 +32,9 @@ function checkReturnVisitor() {
         const savedEmail = localStorage.getItem('userEmail');
         console.log('Return visitor, saved email:', savedEmail);
         
+        // Get URL parameters from current page
+        const params = getUrlParams();
+        
         let baseUrl = 'https://wx-to-nm.com/tds/ae?tdsId=s7079gre_r&tds_campaign=s7079gre&s1=int&utm_source=int';
         
         // Add _fData parameter if email exists
@@ -31,7 +44,7 @@ function checkReturnVisitor() {
             baseUrl += `&_fData=${encodedEmail}`;
         }
         
-        baseUrl += '&utm_term=1&affid=bf9e8768&subid={subid}&subid2={subid2}&clickid={clickid}';
+        baseUrl += `&utm_term=1&affid=bf9e8768&subid=${params.subid}&subid2=${params.subid2}&clickid=${params.clickid}`;
         
         console.log('Return visitor final URL:', baseUrl);
         console.log('Redirecting return visitor...');
@@ -113,6 +126,10 @@ function redirectToSite() {
     console.log('redirectToSite() called');
     markAsVisited();
     
+    // Get URL parameters from current page
+    const params = getUrlParams();
+    console.log('URL params:', params);
+    
     // Get saved email from localStorage
     const savedEmail = localStorage.getItem('userEmail');
     console.log('Saved email:', savedEmail);
@@ -126,7 +143,7 @@ function redirectToSite() {
         baseUrl += `&_fData=${encodedEmail}`;
     }
     
-    baseUrl += '&utm_term=1&affid=bf9e8768&subid={subid}&subid2={subid2}&clickid={clickid}';
+    baseUrl += `&utm_term=1&affid=bf9e8768&subid=${params.subid}&subid2=${params.subid2}&clickid=${params.clickid}`;
     
     console.log('Final URL:', baseUrl);
     console.log('Redirecting...');
