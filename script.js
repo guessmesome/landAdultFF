@@ -3,8 +3,8 @@ const totalSlides = 4;
 
 // Vercel Analytics tracking
 function trackEvent(eventName, properties = {}) {
-    if (window.va) {
-        window.va('event', eventName, properties);
+    if (window.vaTrack) {
+        window.vaTrack(eventName, properties);
     }
     console.log('Analytics Event:', eventName, properties);
 }
