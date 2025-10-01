@@ -1,6 +1,14 @@
 let currentSlide = 1;
 const totalSlides = 4;
 
+// Vercel Analytics tracking
+function trackEvent(eventName, properties = {}) {
+    if (window.va) {
+        window.va('event', eventName, properties);
+    }
+    console.log('Analytics Event:', eventName, properties);
+}
+
 // Function to get URL parameters
 function getUrlParams() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -31,6 +39,11 @@ function checkReturnVisitor() {
         // User has visited before, redirect immediately with saved email
         const savedEmail = localStorage.getItem('userEmail');
         console.log('Return visitor, saved email:', savedEmail);
+        
+        // Track return visitor
+        trackEvent('Return Visitor Redirect', {
+            hasEmail: !!savedEmail
+        });
         
         // Get URL parameters from current page
         const params = getUrlParams();
@@ -71,6 +84,13 @@ function clearVisitorData() {
 
 function nextSlide() {
     if (currentSlide < totalSlides) {
+        // Track slide progression
+        trackEvent('Slide Transition', {
+            from: currentSlide,
+            to: currentSlide + 1,
+            slideProgress: `${currentSlide}/${totalSlides}`
+        });
+        
         // Hide current slide
         document.getElementById(`slide${currentSlide}`).classList.remove('active');
         
@@ -86,6 +106,12 @@ function nextSlideWithEmail() {
     
     // Check if email is valid
     if (email && isValidEmail(email)) {
+        // Track email input
+        trackEvent('Email Entered', {
+            emailDomain: email.split('@')[1] || 'unknown',
+            slideNumber: currentSlide
+        });
+        
         // Save email to localStorage
         localStorage.setItem('userEmail', email);
         nextSlide();
@@ -103,6 +129,14 @@ document.addEventListener('DOMContentLoaded', function() {
     if (checkReturnVisitor()) {
         return; // Will redirect, no need to continue
     }
+    
+    // Track first-time visitor
+    const params = getUrlParams();
+    trackEvent('First Time Visitor', {
+        hasTrafficParams: !!(params.subid || params.clickid || params.subid2),
+        subid: params.subid ? 'yes' : 'no',
+        clickid: params.clickid ? 'yes' : 'no'
+    });
     
     const emailInput = document.getElementById('emailInput');
     const continueBtn = document.getElementById('continueBtn3');
@@ -133,6 +167,14 @@ function redirectToSite() {
     // Get saved email from localStorage
     const savedEmail = localStorage.getItem('userEmail');
     console.log('Saved email:', savedEmail);
+    
+    // Track successful completion
+    trackEvent('Completed Journey', {
+        hasEmail: !!savedEmail,
+        emailDomain: savedEmail ? savedEmail.split('@')[1] : 'none',
+        hasTrafficParams: !!(params.subid || params.clickid || params.subid2),
+        completedAllSlides: currentSlide === totalSlides
+    });
     
     let baseUrl = 'https://ef-to-wz.com/tds/ae?tds_campaign=s7788kru&tdsId=s7788kru_r&s1=int&utm_source=int&utm_term=3&p7=%7Bp7%7D&affid=cf9f103c';
     
