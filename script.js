@@ -1,4 +1,4 @@
-const PASS_DATA = false;
+const PASS_DATA = true;
 
 let currentSlide = 1;
 const totalSlides = 4;
