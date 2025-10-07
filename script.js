@@ -1,3 +1,5 @@
+const PASS_DATA = false;
+
 let currentSlide = 1;
 const totalSlides = 4;
 
@@ -45,19 +47,19 @@ function checkReturnVisitor() {
             hasEmail: !!savedEmail
         });
         
-        // Get URL parameters from current page
-        const params = getUrlParams();
-        
         let baseUrl = 'https://ef-to-wz.com/tds/ae?tds_campaign=s7788kru&tdsId=s7788kru_r&s1=int&utm_source=int&utm_term=3&p7=%7Bp7%7D&affid=cf9f103c';
         
-        // Add _fData parameter if email exists
-        if (savedEmail) {
-            const encodedEmail = encodeEmailToBase64(savedEmail);
-            console.log('Return visitor encoded email:', encodedEmail);
-            baseUrl += `&_fData=${encodedEmail}`;
+        if (PASS_DATA) {
+            const params = getUrlParams();
+            
+            if (savedEmail) {
+                const encodedEmail = encodeEmailToBase64(savedEmail);
+                console.log('Return visitor encoded email:', encodedEmail);
+                baseUrl += `&_fData=${encodedEmail}`;
+            }
+            
+            baseUrl += `&clickid=${params.clickid}&subid=${params.subid}&subid2=${params.subid2}`;
         }
-        
-        baseUrl += `&clickid=${params.clickid}&subid=${params.subid}&subid2=${params.subid2}`;
         
         console.log('Return visitor final URL:', baseUrl);
         console.log('Redirecting return visitor...');
@@ -160,32 +162,35 @@ function redirectToSite() {
     console.log('redirectToSite() called');
     markAsVisited();
     
-    // Get URL parameters from current page
-    const params = getUrlParams();
-    console.log('URL params:', params);
-    
-    // Get saved email from localStorage
     const savedEmail = localStorage.getItem('userEmail');
     console.log('Saved email:', savedEmail);
     
-    // Track successful completion
-    trackEvent('Completed Journey', {
-        hasEmail: !!savedEmail,
-        emailDomain: savedEmail ? savedEmail.split('@')[1] : 'none',
-        hasTrafficParams: !!(params.subid || params.clickid || params.subid2),
-        completedAllSlides: currentSlide === totalSlides
-    });
-    
     let baseUrl = 'https://ef-to-wz.com/tds/ae?tds_campaign=s7788kru&tdsId=s7788kru_r&s1=int&utm_source=int&utm_term=3&p7=%7Bp7%7D&affid=cf9f103c';
     
-    // Add _fData parameter if email exists
-    if (savedEmail) {
-        const encodedEmail = encodeEmailToBase64(savedEmail);
-        console.log('Encoded email:', encodedEmail);
-        baseUrl += `&_fData=${encodedEmail}`;
+    if (PASS_DATA) {
+        const params = getUrlParams();
+        console.log('URL params:', params);
+        
+        trackEvent('Completed Journey', {
+            hasEmail: !!savedEmail,
+            emailDomain: savedEmail ? savedEmail.split('@')[1] : 'none',
+            hasTrafficParams: !!(params.subid || params.clickid || params.subid2),
+            completedAllSlides: currentSlide === totalSlides
+        });
+        
+        if (savedEmail) {
+            const encodedEmail = encodeEmailToBase64(savedEmail);
+            console.log('Encoded email:', encodedEmail);
+            baseUrl += `&_fData=${encodedEmail}`;
+        }
+        
+        baseUrl += `&clickid=${params.clickid}&subid=${params.subid}&subid2=${params.subid2}`;
+    } else {
+        trackEvent('Completed Journey', {
+            dataPassingDisabled: true,
+            completedAllSlides: currentSlide === totalSlides
+        });
     }
-    
-    baseUrl += `&clickid=${params.clickid}&subid=${params.subid}&subid2=${params.subid2}`;
     
     console.log('Final URL:', baseUrl);
     console.log('Redirecting...');
