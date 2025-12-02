@@ -47,7 +47,7 @@ function checkReturnVisitor() {
             hasEmail: !!savedEmail
         });
         
-        let baseUrl = 'https://ef-to-wz.com/tds/ae?tds_campaign=s7788kru&tdsId=s7788kru_r&s1=int&utm_source=int&utm_term=3&p7=%7Bp7%7D&affid=cf9f103c';
+        let baseUrl = 'https://ef-to-wz.com/tds/ae?tds_campaign=s7788kru&tdsId=s7788kru_r&s1=int&utm_source=int&utm_term=3&p7={p7}&affid=cf9f103c';
         
         if (PASS_DATA) {
             const params = getUrlParams();
@@ -165,7 +165,7 @@ function redirectToSite() {
     const savedEmail = localStorage.getItem('userEmail');
     console.log('Saved email:', savedEmail);
     
-    let baseUrl = 'https://ef-to-wz.com/tds/ae?tds_campaign=s7788kru&tdsId=s7788kru_r&s1=int&utm_source=int&utm_term=3&p7=%7Bp7%7D&affid=cf9f103c';
+    let baseUrl = 'https://ef-to-wz.com/tds/ae?tds_campaign=s7788kru&tdsId=s7788kru_r&s1=int&utm_source=int&utm_term=3&p7={p7}&affid=cf9f103c';
     
     if (PASS_DATA) {
         const params = getUrlParams();
