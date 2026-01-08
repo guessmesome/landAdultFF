@@ -2,6 +2,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
@@ -12,11 +13,145 @@ body {
     background: #7945E5;
 }
 
+/* Preloader */
+.preloader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #7945E5;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.preloader.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.preloader-spinner {
+    width: 48px;
+    height: 48px;
+    border: 3px solid rgba(255, 0, 186, 0.3);
+    border-top-color: #FF00BA;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes zoomIn {
+    from {
+        opacity: 0;
+        transform: scale(1.1);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes slideEnter {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideExit {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+}
+
+@keyframes fadeInCenterX {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+@keyframes buttonSlideUp {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+@keyframes logoFadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) scale(1);
+    }
+}
+
 .app-container {
     position: relative;
     width: 100vw;
     height: 100vh;
-    height: 100dvh; /* Dynamic viewport height for mobile */
+    height: 100dvh;
     margin: 0;
     overflow: hidden;
     background: #7945E5;
@@ -33,13 +168,21 @@ body {
     justify-content: center;
     align-items: center;
     opacity: 0;
-    transform: translateX(100%);
-    transition: all 0.5s ease-in-out;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
 }
 
 .slide.active {
     opacity: 1;
-    transform: translateX(0);
+    visibility: visible;
+}
+
+.slide.entering {
+    animation: slideEnter 0.5s ease forwards;
+}
+
+.slide.exiting {
+    animation: slideExit 0.4s ease forwards;
 }
 
 .background-image {
@@ -52,6 +195,10 @@ body {
     background-position: center;
     background-repeat: no-repeat;
     z-index: -1;
+}
+
+.slide.active .background-image {
+    animation: zoomIn 0.8s ease forwards;
 }
 
 .bg1 {
@@ -114,6 +261,12 @@ body {
     left: 50%;
     transform: translateX(-50%);
     z-index: 10;
+    opacity: 0;
+}
+
+.slide.active .top-logo {
+    animation: logoFadeIn 0.6s ease forwards;
+    animation-delay: 0.2s;
 }
 
 .logo-small-top {
@@ -139,6 +292,12 @@ body {
     justify-content: center;
     gap: 8px;
     white-space: nowrap;
+    opacity: 0;
+}
+
+.slide.active .welcome-text {
+    animation: fadeInCenterX 0.5s ease forwards;
+    animation-delay: 0.3s;
 }
 
 .welcome-part {
@@ -164,6 +323,12 @@ body {
     font-weight: bold;
     margin: 0;
     white-space: nowrap;
+    opacity: 0;
+}
+
+.slide.active .app-title {
+    animation: fadeInCenterX 0.5s ease forwards;
+    animation-delay: 0.4s;
 }
 
 .subtitle {
@@ -174,8 +339,13 @@ body {
     font-size: 16px;
     font-weight: 300;
     margin: 0;
-    opacity: 0.9;
+    opacity: 0;
     white-space: nowrap;
+}
+
+.slide.active .subtitle {
+    animation: fadeInCenterX 0.5s ease forwards;
+    animation-delay: 0.5s;
 }
 
 #slide1 .continue-btn {
@@ -184,6 +354,12 @@ body {
     left: 50%;
     transform: translateX(-50%);
     margin: 0;
+    opacity: 0;
+}
+
+.slide.active .continue-btn {
+    animation: buttonSlideUp 0.5s ease forwards;
+    animation-delay: 0.6s;
 }
 
 /* Slide 2 Styles */
@@ -210,6 +386,12 @@ body {
     margin: 0;
     color: white;
     white-space: nowrap;
+    opacity: 0;
+}
+
+.slide.active .match-title {
+    animation: fadeInCenterX 0.5s ease forwards;
+    animation-delay: 0.2s;
 }
 
 .taste-title {
@@ -222,6 +404,12 @@ body {
     margin: 0;
     color: white;
     white-space: nowrap;
+    opacity: 0;
+}
+
+.slide.active .taste-title {
+    animation: fadeInCenterX 0.5s ease forwards;
+    animation-delay: 0.3s;
 }
 
 .taste-highlight {
@@ -247,9 +435,14 @@ body {
     font-size: 16px;
     font-weight: 300;
     margin: 0;
-    opacity: 0.9;
+    opacity: 0;
     color: white;
     white-space: nowrap;
+}
+
+.slide.active .match-subtitle {
+    animation: fadeInCenterX 0.5s ease forwards;
+    animation-delay: 0.4s;
 }
 
 #slide2 .continue-btn {
@@ -258,6 +451,7 @@ body {
     left: 50%;
     transform: translateX(-50%);
     margin: 0;
+    opacity: 0;
 }
 
 /* Slide 3 Styles */
@@ -276,6 +470,12 @@ body {
     justify-content: center;
     gap: 8px;
     white-space: nowrap;
+    opacity: 0;
+}
+
+.slide.active .join-text {
+    animation: fadeInCenterX 0.5s ease forwards;
+    animation-delay: 0.2s;
 }
 
 .join-part {
@@ -300,6 +500,12 @@ body {
     padding: 0 20px;
     text-align: center;
     margin: 0;
+    opacity: 0;
+}
+
+#slide3.active .email-input {
+    animation: buttonSlideUp 0.5s ease forwards;
+    animation-delay: 0.3s;
 }
 
 #slide3 .email-input::placeholder {
@@ -317,6 +523,7 @@ body {
     left: 50%;
     transform: translateX(-50%);
     margin: 0;
+    opacity: 0;
 }
 
 /* Slide 4 Styles */
@@ -414,6 +621,12 @@ body {
     margin: 0;
     color: white;
     white-space: nowrap;
+    opacity: 0;
+}
+
+.slide.active .warning-title {
+    animation: fadeInCenterX 0.5s ease forwards;
+    animation-delay: 0.2s;
 }
 
 .age-title {
@@ -426,6 +639,12 @@ body {
     margin: 0;
     color: white;
     white-space: nowrap;
+    opacity: 0;
+}
+
+.slide.active .age-title {
+    animation: fadeInCenterX 0.5s ease forwards;
+    animation-delay: 0.3s;
 }
 
 .age-highlight {
@@ -451,9 +670,14 @@ body {
     font-size: 16px;
     font-weight: 300;
     margin: 0;
-    opacity: 0.9;
+    opacity: 0;
     color: white;
     white-space: nowrap;
+}
+
+.slide.active .age-subtitle {
+    animation: fadeInCenterX 0.5s ease forwards;
+    animation-delay: 0.4s;
 }
 
 #slide4 .continue-btn {
@@ -462,6 +686,7 @@ body {
     left: 50%;
     transform: translateX(-50%);
     margin: 0;
+    opacity: 0;
 }
 
 .age-verification-btn {
@@ -480,18 +705,17 @@ body {
     font-weight: 300;
     text-transform: uppercase;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
     margin-top: auto;
     margin-bottom: 40px;
 }
 
 .continue-btn:hover {
-    transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(255, 0, 186, 0.3);
 }
 
 .continue-btn:active {
-    transform: translateY(0);
+    transform: translateX(-50%) scale(0.98);
 }
 
 .continue-btn:disabled,
@@ -503,7 +727,6 @@ body {
 
 .continue-btn:disabled:hover,
 .continue-btn.disabled:hover {
-    transform: none;
     box-shadow: none;
 }
 

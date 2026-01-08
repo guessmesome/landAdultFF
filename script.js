@@ -3,7 +3,48 @@ const PASS_DATA = true;
 let currentSlide = 1;
 const totalSlides = 4;
 
-// Vercel Analytics tracking
+const imagesToPreload = [
+    'images/bg1.jpg',
+    'images/bg2.jpg',
+    'images/bg3.jpg',
+    'images/bg4.jpg',
+    'images/logo-big.png',
+    'images/logo-small.png'
+];
+
+function preloadImages() {
+    return new Promise((resolve) => {
+        let loaded = 0;
+        const total = imagesToPreload.length;
+
+        imagesToPreload.forEach((src) => {
+            const img = new Image();
+            img.onload = img.onerror = () => {
+                loaded++;
+                if (loaded >= total) {
+                    resolve();
+                }
+            };
+            img.src = src;
+        });
+
+        setTimeout(resolve, 5000);
+    });
+}
+
+function hidePreloader() {
+    const preloader = document.getElementById('preloader');
+    if (preloader) {
+        preloader.classList.add('hidden');
+        setTimeout(() => {
+            const slide1 = document.getElementById('slide1');
+            if (slide1) {
+                slide1.classList.add('active', 'entering');
+            }
+        }, 100);
+    }
+}
+
 function trackEvent(eventName, properties = {}) {
     if (window.vaTrack) {
         window.vaTrack(eventName, properties);
@@ -11,7 +52,6 @@ function trackEvent(eventName, properties = {}) {
     console.log('Analytics Event:', eventName, properties);
 }
 
-// Function to get URL parameters
 function getUrlParams() {
     const urlParams = new URLSearchParams(window.location.search);
     return {
@@ -21,28 +61,23 @@ function getUrlParams() {
     };
 }
 
-// Function to encode email to base64 JSON format
 function encodeEmailToBase64(email) {
     if (!email) return '';
     
     const emailObj = { "email": email };
     const jsonString = JSON.stringify(emailObj);
     
-    // Encode to base64
     return btoa(jsonString);
 }
 
-// Check if user has visited before
 function checkReturnVisitor() {
     const hasVisited = localStorage.getItem('footFetishVisited');
     console.log('checkReturnVisitor() called, hasVisited:', hasVisited);
     
     if (hasVisited) {
-        // User has visited before, redirect immediately with saved email
         const savedEmail = localStorage.getItem('userEmail');
         console.log('Return visitor, saved email:', savedEmail);
         
-        // Track return visitor
         trackEvent('Return Visitor Redirect', {
             hasEmail: !!savedEmail
         });
@@ -71,13 +106,11 @@ function checkReturnVisitor() {
     return false;
 }
 
-// Mark user as visited
 function markAsVisited() {
     localStorage.setItem('footFetishVisited', 'true');
     localStorage.setItem('footFetishVisitTime', new Date().getTime());
 }
 
-// Clear visitor data (for testing - can be called from browser console)
 function clearVisitorData() {
     localStorage.removeItem('footFetishVisited');
     localStorage.removeItem('footFetishVisitTime');
@@ -86,19 +119,25 @@ function clearVisitorData() {
 
 function nextSlide() {
     if (currentSlide < totalSlides) {
-        // Track slide progression
         trackEvent('Slide Transition', {
             from: currentSlide,
             to: currentSlide + 1,
             slideProgress: `${currentSlide}/${totalSlides}`
         });
         
-        // Hide current slide
-        document.getElementById(`slide${currentSlide}`).classList.remove('active');
+        const currentSlideEl = document.getElementById(`slide${currentSlide}`);
+        const nextSlideEl = document.getElementById(`slide${currentSlide + 1}`);
         
-        // Show next slide
-        currentSlide++;
-        document.getElementById(`slide${currentSlide}`).classList.add('active');
+        if (currentSlideEl && nextSlideEl) {
+            currentSlideEl.classList.remove('entering');
+            currentSlideEl.classList.add('exiting');
+            
+            setTimeout(() => {
+                currentSlideEl.classList.remove('active', 'exiting');
+                nextSlideEl.classList.add('active', 'entering');
+                currentSlide++;
+            }, 400);
+        }
     }
 }
 
@@ -106,15 +145,12 @@ function nextSlideWithEmail() {
     const emailInput = document.getElementById('emailInput');
     const email = emailInput.value.trim();
     
-    // Check if email is valid
     if (email && isValidEmail(email)) {
-        // Track email input
         trackEvent('Email Entered', {
             emailDomain: email.split('@')[1] || 'unknown',
             slideNumber: currentSlide
         });
         
-        // Save email to localStorage
         localStorage.setItem('userEmail', email);
         nextSlide();
     }
@@ -125,14 +161,14 @@ function isValidEmail(email) {
     return emailRegex.test(email);
 }
 
-// Email input validation for slide 3
-document.addEventListener('DOMContentLoaded', function() {
-    // Check for return visitor first
+document.addEventListener('DOMContentLoaded', async function() {
     if (checkReturnVisitor()) {
-        return; // Will redirect, no need to continue
+        return;
     }
     
-    // Track first-time visitor
+    await preloadImages();
+    hidePreloader();
+    
     const params = getUrlParams();
     trackEvent('First Time Visitor', {
         hasTrafficParams: !!(params.subid || params.clickid || params.subid2),
@@ -198,7 +234,6 @@ function redirectToSite() {
     window.location.href = baseUrl;
 }
 
-// Touch/swipe functionality for mobile
 let startX = 0;
 let startY = 0;
 
@@ -218,9 +253,7 @@ document.addEventListener('touchend', function(e) {
     let diffX = startX - endX;
     let diffY = startY - endY;
 
-    // Only trigger swipe if horizontal movement is greater than vertical
     if (Math.abs(diffX) > Math.abs(diffY)) {
-        // Swipe left (next slide)
         if (diffX > 50 && currentSlide < totalSlides) {
             nextSlide();
         }
@@ -230,12 +263,10 @@ document.addEventListener('touchend', function(e) {
     startY = 0;
 });
 
-// Prevent scroll on mobile
 document.addEventListener('touchmove', function(e) {
     e.preventDefault();
 }, { passive: false });
 
-// Keyboard navigation
 document.addEventListener('keydown', function(e) {
     if (e.key === 'ArrowRight' || e.key === ' ') {
         if (currentSlide < totalSlides) {
