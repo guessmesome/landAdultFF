@@ -1,7 +1,12 @@
 const PASS_DATA = true;
 
+const SUPABASE_EDGE_URL = 'https://fljznpejgywacrnxlggv.supabase.co/functions/v1/get-redirect-url';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZsanpucGVqZ3l3YWNybnhsZ2d2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUwODc3ODcsImV4cCI6MjA4MDY2Mzc4N30.oDc46bCj9ZPdUUUvdDTddY5un3A1_lIFUrs_UfFh6N4';
+const LANDING_KEY = 'ffskdult';
+
 let currentSlide = 1;
 const totalSlides = 4;
+let cachedOfferUrl = null;
 
 const imagesToPreload = [
     'images/bg1.jpg',
@@ -45,17 +50,11 @@ function hidePreloader() {
     }
 }
 
-function trackEvent(eventName, properties = {}) {
-    if (window.vaTrack) {
-        window.vaTrack(eventName, properties);
-    }
-    console.log('Analytics Event:', eventName, properties);
-}
-
 function getUrlParams() {
     const urlParams = new URLSearchParams(window.location.search);
     return {
         subid: urlParams.get('subid') || '',
+        p7: urlParams.get('p7') || '',
         clickid: urlParams.get('clickid') || '',
         subid2: urlParams.get('subid2') || ''
     };
@@ -63,46 +62,90 @@ function getUrlParams() {
 
 function encodeEmailToBase64(email) {
     if (!email) return '';
-    
     const emailObj = { "email": email };
     const jsonString = JSON.stringify(emailObj);
-    
     return btoa(jsonString);
 }
 
-function checkReturnVisitor() {
+async function getOfferUrl() {
+    if (cachedOfferUrl) {
+        console.log('Using cached offer URL:', cachedOfferUrl);
+        return cachedOfferUrl;
+    }
+
+    console.log('Fetching offer URL for key:', LANDING_KEY);
+
+    try {
+        const response = await fetch(SUPABASE_EDGE_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+            },
+            body: JSON.stringify({ key: LANDING_KEY })
+        });
+
+        console.log('Response status:', response.status);
+        const data = await response.json();
+        console.log('Response data:', data);
+
+        if (data.success && data.url) {
+            cachedOfferUrl = data.url;
+            console.log('Offer URL loaded successfully:', cachedOfferUrl);
+            return cachedOfferUrl;
+        } else {
+            console.error('Failed to get offer URL. Response:', data);
+            return null;
+        }
+    } catch (error) {
+        console.error('Error fetching offer URL:', error);
+        return null;
+    }
+}
+
+function buildFinalUrl(baseUrl, email) {
+    if (!baseUrl) return null;
+
+    const params = getUrlParams();
+    const encodedEmail = email ? encodeEmailToBase64(email) : '';
+
+    let finalUrl = baseUrl
+        .replace('{p7}', encodeURIComponent(params.p7))
+        .replace('{clickid}', encodeURIComponent(params.clickid))
+        .replace('{subid}', encodeURIComponent(params.subid))
+        .replace('{subid2}', encodeURIComponent(params.subid2))
+        .replace('{_fData}', encodedEmail);
+
+    finalUrl += `?myfdata=${encodedEmail}`;
+
+    console.log('buildFinalUrl result:', finalUrl);
+    return finalUrl;
+}
+
+async function checkReturnVisitor() {
     const hasVisited = localStorage.getItem('footFetishVisited');
     console.log('checkReturnVisitor() called, hasVisited:', hasVisited);
-    
+
     if (hasVisited) {
-        const savedEmail = localStorage.getItem('userEmail');
+        const savedEmail = localStorage.getItem('userEmailFootFetish');
         console.log('Return visitor, saved email:', savedEmail);
-        
-        trackEvent('Return Visitor Redirect', {
-            hasEmail: !!savedEmail
-        });
-        
-        let baseUrl = 'https://ef-to-wz.com/tds/ae?tds_campaign=s7788kru&tdsId=s7788kru_r&s1=int&utm_source=int&utm_term=3&p7={p7}&affid=cf9f103c';
-        
-        if (PASS_DATA) {
-            const params = getUrlParams();
-            
-            if (savedEmail) {
-                const encodedEmail = encodeEmailToBase64(savedEmail);
-                console.log('Return visitor encoded email:', encodedEmail);
-                baseUrl += `&_fData=${encodedEmail}`;
-            }
-            
-            baseUrl += `&clickid=${params.clickid}&subid=${params.subid}&subid2=${params.subid2}`;
+
+        const offerUrl = await getOfferUrl();
+
+        if (!offerUrl) {
+            console.error('Could not get offer URL for return visitor');
+            return false;
         }
-        
-        console.log('Return visitor final URL:', baseUrl);
+
+        const finalUrl = buildFinalUrl(offerUrl, savedEmail);
+        console.log('Return visitor final URL:', finalUrl);
         console.log('Redirecting return visitor...');
-        
-        window.location.href = baseUrl;
+
+        window.location.href = finalUrl;
         return true;
     }
-    
+
     return false;
 }
 
@@ -114,29 +157,24 @@ function markAsVisited() {
 function clearVisitorData() {
     localStorage.removeItem('footFetishVisited');
     localStorage.removeItem('footFetishVisitTime');
+    localStorage.removeItem('userEmailFootFetish');
     console.log('Visitor data cleared');
 }
 
 function nextSlide() {
     if (currentSlide < totalSlides) {
-        trackEvent('Slide Transition', {
-            from: currentSlide,
-            to: currentSlide + 1,
-            slideProgress: `${currentSlide}/${totalSlides}`
-        });
-        
         const currentSlideEl = document.getElementById(`slide${currentSlide}`);
         const nextSlideEl = document.getElementById(`slide${currentSlide + 1}`);
-        
+
         if (currentSlideEl && nextSlideEl) {
             currentSlideEl.classList.remove('entering');
             currentSlideEl.classList.add('exiting');
-            
+
             setTimeout(() => {
                 currentSlideEl.classList.remove('active', 'exiting');
                 nextSlideEl.classList.add('active', 'entering');
                 currentSlide++;
-            }, 400);
+            }, 500);
         }
     }
 }
@@ -144,14 +182,9 @@ function nextSlide() {
 function nextSlideWithEmail() {
     const emailInput = document.getElementById('emailInput');
     const email = emailInput.value.trim();
-    
+
     if (email && isValidEmail(email)) {
-        trackEvent('Email Entered', {
-            emailDomain: email.split('@')[1] || 'unknown',
-            slideNumber: currentSlide
-        });
-        
-        localStorage.setItem('userEmail', email);
+        localStorage.setItem('userEmailFootFetish', email);
         nextSlide();
     }
 }
@@ -161,88 +194,75 @@ function isValidEmail(email) {
     return emailRegex.test(email);
 }
 
-document.addEventListener('DOMContentLoaded', async function() {
-    if (checkReturnVisitor()) {
+document.addEventListener('DOMContentLoaded', async function () {
+    getOfferUrl();
+
+    if (await checkReturnVisitor()) {
         return;
     }
-    
+
     await preloadImages();
     hidePreloader();
-    
-    const params = getUrlParams();
-    trackEvent('First Time Visitor', {
-        hasTrafficParams: !!(params.subid || params.clickid || params.subid2),
-        subid: params.subid ? 'yes' : 'no',
-        clickid: params.clickid ? 'yes' : 'no'
-    });
-    
+
     const emailInput = document.getElementById('emailInput');
     const continueBtn = document.getElementById('continueBtn3');
-    
+
+    function validateEmailButton() {
+        if (!emailInput || !continueBtn) return;
+        const email = emailInput.value.trim();
+
+        if (email && isValidEmail(email)) {
+            continueBtn.disabled = false;
+            continueBtn.classList.remove('disabled');
+            continueBtn.classList.add('active');
+        } else {
+            continueBtn.disabled = true;
+            continueBtn.classList.add('disabled');
+            continueBtn.classList.remove('active');
+        }
+    }
+
     if (emailInput && continueBtn) {
-        emailInput.addEventListener('input', function() {
-            const email = this.value.trim();
-            
-            if (email && isValidEmail(email)) {
-                continueBtn.disabled = false;
-                continueBtn.classList.remove('disabled');
-            } else {
-                continueBtn.disabled = true;
-                continueBtn.classList.add('disabled');
-            }
-        });
+        emailInput.addEventListener('input', validateEmailButton);
+        emailInput.addEventListener('change', validateEmailButton);
+        emailInput.addEventListener('keyup', validateEmailButton);
+        setTimeout(validateEmailButton, 100);
     }
 });
 
-function redirectToSite() {
-    console.log('redirectToSite() called');
+async function redirectToSite() {
+    console.log('=== redirectToSite() START ===');
     markAsVisited();
-    
-    const savedEmail = localStorage.getItem('userEmail');
+
+    const savedEmail = localStorage.getItem('userEmailFootFetish');
     console.log('Saved email:', savedEmail);
-    
-    let baseUrl = 'https://ef-to-wz.com/tds/ae?tds_campaign=s7788kru&tdsId=s7788kru_r&s1=int&utm_source=int&utm_term=3&p7={p7}&affid=cf9f103c';
-    
-    if (PASS_DATA) {
-        const params = getUrlParams();
-        console.log('URL params:', params);
-        
-        trackEvent('Completed Journey', {
-            hasEmail: !!savedEmail,
-            emailDomain: savedEmail ? savedEmail.split('@')[1] : 'none',
-            hasTrafficParams: !!(params.subid || params.clickid || params.subid2),
-            completedAllSlides: currentSlide === totalSlides
-        });
-        
-        if (savedEmail) {
-            const encodedEmail = encodeEmailToBase64(savedEmail);
-            console.log('Encoded email:', encodedEmail);
-            baseUrl += `&_fData=${encodedEmail}`;
-        }
-        
-        baseUrl += `&clickid=${params.clickid}&subid=${params.subid}&subid2=${params.subid2}`;
-    } else {
-        trackEvent('Completed Journey', {
-            dataPassingDisabled: true,
-            completedAllSlides: currentSlide === totalSlides
-        });
+
+    console.log('Fetching offer URL from Supabase...');
+    const offerUrl = await getOfferUrl();
+    console.log('Offer URL from Supabase:', offerUrl);
+
+    if (!offerUrl) {
+        console.error('Could not get offer URL');
+        alert('Connection error. Please try again.');
+        return;
     }
-    
-    console.log('Final URL:', baseUrl);
-    console.log('Redirecting...');
-    
-    window.location.href = baseUrl;
+
+    const finalUrl = buildFinalUrl(offerUrl, savedEmail);
+    console.log('=== FINAL URL ===:', finalUrl);
+    console.log('Redirecting now...');
+
+    window.location.href = finalUrl;
 }
 
 let startX = 0;
 let startY = 0;
 
-document.addEventListener('touchstart', function(e) {
+document.addEventListener('touchstart', function (e) {
     startX = e.touches[0].clientX;
     startY = e.touches[0].clientY;
 });
 
-document.addEventListener('touchend', function(e) {
+document.addEventListener('touchend', function (e) {
     if (!startX || !startY) {
         return;
     }
@@ -263,11 +283,11 @@ document.addEventListener('touchend', function(e) {
     startY = 0;
 });
 
-document.addEventListener('touchmove', function(e) {
+document.addEventListener('touchmove', function (e) {
     e.preventDefault();
 }, { passive: false });
 
-document.addEventListener('keydown', function(e) {
+document.addEventListener('keydown', function (e) {
     if (e.key === 'ArrowRight' || e.key === ' ') {
         if (currentSlide < totalSlides) {
             nextSlide();
