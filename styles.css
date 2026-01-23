@@ -257,7 +257,7 @@ body {
 
 .top-logo {
     position: absolute;
-    top: -5px;
+    top: 30px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 10;
@@ -271,7 +271,7 @@ body {
 
 .logo-small-top {
     width: 112px;
-    height: 112px;
+    height: auto;
 }
 
 .bottom-content {
